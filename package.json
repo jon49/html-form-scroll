@@ -1,0 +1,26 @@
+{
+  "name": "html-form-scroll",
+  "version": "0.0.1",
+  "description": "HTML Form Scroll Extension",
+  "main": "html-form-scroll.js",
+  "homepage": "https://github.com/jon49/html-form-scroll#readme",
+  "bugs": {
+    "url": "https://github.com/jon49/html-form-scroll/issues"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "./tasks/build.sh"
+  },
+  "keywords": [
+    "html-form",
+    "scroll",
+    "html"
+  ],
+  "author": "Jon Nyman",
+  "license": "ISC",
+  "dependencies": {
+    "esbuild": "^0.25.10",
+    "html-form": "^0.12.0",
+    "html-form-test-suite": "^0.0.1"
+  }
+}
