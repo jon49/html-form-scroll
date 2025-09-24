@@ -1,5 +1,4 @@
 let attrPrefix = "hf-scroll-",
-    miss = `${attrPrefix}miss`,
     scrollTo = `${attrPrefix}to`,
     scrollTarget = `${attrPrefix}target`,
     focusIgnore = `hf-focus-ignore`,
@@ -20,25 +19,21 @@ let { attr, hasAttr } = w.htmf
 let pageLocation
 
 function beforeUnload(e) {
-    let { submitter, form } = e.detail.submitter
+    let { submitter, form } = e.detail
     let active = doc.activeElement
     let target = active === doc.body ? lastClick : active
-    let to = [submitter, form].find(x => attr(x, scrollTo))
+    let to = [submitter, form].map(x => attr(x, scrollTo)).find(x => x)
     let $scrollTarget = attr(target, scrollTarget)
     if ($scrollTarget) {
         target = query($scrollTarget)
     }
-    let miss = attr(target?.closest(`[${miss}]`), miss)
-    let name = attr(target, "name")
     pageLocation = {
         y: w.scrollY,
         to,
         // active
         a: {
             // target
-            t: { y: calculateY(target), q: (target?.id && `#${target.id}`) || (name && `[name="${name}"]`) },
-            // miss
-            m: { y: calculateY(query(miss)), q: miss }
+            t: { y: calculateY(target), q: target },
         }
     }
 }
@@ -55,7 +50,7 @@ function onLoad() {
     }
 
     if (!pageLocation) return
-    let { y, to, a: { t, m } } = pageLocation
+    let { y, to, a: { t } } = pageLocation
 
     let scrollTo = query(to)
     if (scrollTo) {
@@ -64,10 +59,8 @@ function onLoad() {
 
     let active
     let elY =
-        (t.q && (active = query(t.q)))
+        (active = t.q)
             ?  t.y
-        : (m.q && (active = query(m.q)))
-            ?  m.y
         : 0
     if (!hasAttr(focusIgnore)(active)) {
         active?.focus?.()

@@ -1,31 +1,120 @@
 <html lang="en">
+
 <head>
-    <title>HTMF test suite</title>
-    <script src="/html-form.js"></script>
-    <script src="/public/html-form-scroll.js"></script>
-    <script src="/js/test-framework.js"></script>
-    <link href="/css/test.css" rel="stylesheet">
+  <title>HTMF test suite</title>
+  <script src="./html-form.js"></script>
+  <script src="./public/html-form-scroll.js"></script>
+  <script src="./js/test-framework.js"></script>
+  <link href="./css/test.css" rel="stylesheet">
+  <style>
+    body {
+      padding-bottom: 50vw;
+    }
+  </style>
 </head>
-<body>
 
-<header>
-    <h1>&#x1F6B2; HTMF test suite</h1>
-    <div>
-        <div class="passed-info">Passed: <output></output></div>
-        <div class="failed-info">Failed: <output></output></div>
-        <a href="javascript:document.body.classList.toggle('hide-passed')">Toggle Passed</a><br/>
-        <a href="test.html">Run All</a>
-    </div>
-</header>
+<body serial>
 
-<main>
-    <section id="scroll">
+  <header>
+    <h1 id="scroll">&#9732; HTMF Scroll Test Suite</h1>
+  </header>
+
+  <main>
+    <section>
       <h2>Scroll Tests</h2>
+
+      <div class="test">
+        <h3>Test stays in position when form submitted and focused on input.</h3>
+        <script>
+          test($ => {
+            let input = $.find('input')
+            input.scrollIntoView()
+            let inputY = input.getBoundingClientRect().y
+            input.select()
+            let button = $.find('button')
+            button.click()
+            $.on(button, "hf:completed", e => {
+              $.assertEq(inputY, input.getBoundingClientRect().y)
+              $.off()
+            })
+          })
+        </script>
+        <div data-list></div>
+        <form action="./items" hf-swap="beforeend" target="[data-list]">
+          <input name="test" value="data">
+          <button>Button</button>
+        </form>
+      </div>
+
+      <div class="test">
+        <h3>Targets a different element. Used for when the element is removed.</h3>
+        <script>
+          test($ => {
+            let input = $.find('input')
+            input.scrollIntoView()
+            input.focus()
+            let targetY = targetMe.getBoundingClientRect().y
+            let button = $.find('button')
+            button.click()
+            $.on(document, "hf:completed", e => {
+              if (e.detail.submitter === button) {
+                $.assertEq(targetY, targetMe.getBoundingClientRect().y)
+                $.off()
+              }
+            })
+          })
+        </script>
+        <form
+          id="targetMe"
+          action="./items"
+          hf-swap="innerHTML"
+          hf-scroll-target="#targetMe"
+          target="#targetMe">
+          <input name="test" value="data">
+          <button>Button</button>
+        </form>
+      </div>
+
+      <div class="test">
+        <h3>Smooth scrolls to specified position.</h3>
+        <script>
+          test($ => {
+            function isInViewport(element) {
+              const rect = element.getBoundingClientRect();
+              return (
+                rect.top >= 0 &&
+                rect.left >= 0 &&
+                rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+                rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+              );
+            }
+            let input = $.find('input')
+            input.scrollIntoView()
+            let inputY = input.getBoundingClientRect().y
+            input.select()
+            let button = $.find('button')
+            button.click()
+            $.on(button, "hf:completed", async e => {
+              await sleep(1e3)
+              $.assertEq(isInViewport(document.getElementById("scroll")), true)
+              $.assertEq(inputY !== input.getBoundingClientRect().y, true)
+              $.off()
+            })
+          })
+        </script>
+        <div data-list2></div>
+        <form action="./items" hf-swap="beforeend" target="[data-list2]" hf-scroll-to="#scroll">
+          <input name="test" value="data3">
+          <button>Button</button>
+        </form>
+      </div>
+
     </section>
 
-</main>
+  </main>
 
-<form hf id="get"></form>
+  <form hf id="get"></form>
 
 </body>
+
 </html>

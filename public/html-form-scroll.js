@@ -1,6 +1,5 @@
 (() => {
   let attrPrefix = "hf-scroll-";
-  let miss = `${attrPrefix}miss`;
   let scrollTo = `${attrPrefix}to`;
   let scrollTarget = `${attrPrefix}target`;
   let focusIgnore = `hf-focus-ignore`;
@@ -17,25 +16,21 @@
   let { attr, hasAttr } = w.htmf;
   let pageLocation;
   function beforeUnload(e) {
-    let { submitter, form } = e.detail.submitter;
+    let { submitter, form } = e.detail;
     let active = doc.activeElement;
     let target = active === doc.body ? lastClick : active;
-    let to = [submitter, form].find((x) => attr(x, scrollTo));
+    let to = [submitter, form].map((x) => attr(x, scrollTo)).find((x) => x);
     let $scrollTarget = attr(target, scrollTarget);
     if ($scrollTarget) {
       target = query($scrollTarget);
     }
-    let miss2 = attr(target?.closest(`[${miss2}]`), miss2);
-    let name = attr(target, "name");
     pageLocation = {
       y: w.scrollY,
       to,
       // active
       a: {
         // target
-        t: { y: calculateY(target), q: target?.id && `#${target.id}` || name && `[name="${name}"]` },
-        // miss
-        m: { y: calculateY(query(miss2)), q: miss2 }
+        t: { y: calculateY(target), q: target }
       }
     };
   }
@@ -50,13 +45,13 @@
       });
     }
     if (!pageLocation) return;
-    let { y, to, a: { t, m } } = pageLocation;
+    let { y, to, a: { t } } = pageLocation;
     let scrollTo2 = query(to);
     if (scrollTo2) {
       return scrollTo2.scrollIntoView({ behavior: "smooth" });
     }
     let active;
-    let elY = t.q && (active = query(t.q)) ? t.y : m.q && (active = query(m.q)) ? m.y : 0;
+    let elY = (active = t.q) ? t.y : 0;
     if (!hasAttr(focusIgnore)(active)) {
       active?.focus?.();
       active?.select?.();
